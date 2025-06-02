@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -26,26 +27,6 @@ def declare_arguments():
         DeclareLaunchArgument(
             'use_sim_time', default_value='false',
             description='Use simulation (Gazebo) clock if true'))
-
-    # declared_arguments.append(
-    #     DeclareLaunchArgument(
-    #         'initial_pose_x', default_value='0',
-    #         description='Initial x position of the robot'))
-
-    # declared_arguments.append(
-    #     DeclareLaunchArgument(
-    #         'initial_pose_y', default_value='0',
-    #         description='Initial y position of the robot'))
-
-    # declared_arguments.append(
-    #     DeclareLaunchArgument(
-    #         'initial_pose_z', default_value='0',
-    #         description='Initial z position of the robot'))
-
-    # declared_arguments.append(
-    #     DeclareLaunchArgument(
-    #         'initial_pose_yaw', default_value='0',
-    #         description='Initial yaw of the robot'))
 
     declared_arguments.append(
         DeclareLaunchArgument(
@@ -77,6 +58,11 @@ def declare_arguments():
             'map_subscribe_transient_local', default_value='true',
             description='Whether to set the map subscriber QoS to transient local'))
 
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            'odom_topic', default_value='omni_base_controller/wheel_odom',
+            description='Odometry topic name'))
+
     return declared_arguments
 
 
@@ -88,10 +74,6 @@ def generate_launch_description():
     params_file = LaunchConfiguration('params_file')
     default_bt_xml_filename = LaunchConfiguration('default_bt_xml_filename')
     map_subscribe_transient_local = LaunchConfiguration('map_subscribe_transient_local')
-    # initial_pose_x = LaunchConfiguration('initial_pose_x')
-    # initial_pose_y = LaunchConfiguration('initial_pose_y')
-    # initial_pose_z = LaunchConfiguration('initial_pose_z')
-    # initial_pose_yaw = LaunchConfiguration('initial_pose_yaw')
 
     lifecycle_nodes = ['controller_server',
                        'planner_server',
@@ -106,15 +88,10 @@ def generate_launch_description():
 
     param_substitutions = {
         'use_sim_time': use_sim_time,
-        # we want to set the initial pose from the launch argument here,
-        # but not work because we have no way to hand this to localization_launch.py
-        # 'initial_pose.x': initial_pose_x,
-        # 'initial_pose.y': initial_pose_y,
-        # 'initial_pose.z': initial_pose_z,
-        # 'initial_pose.yaw': initial_pose_yaw,
         'default_bt_xml_filename': default_bt_xml_filename,
         'autostart': autostart,
-        'map_subscribe_transient_local': map_subscribe_transient_local}
+        'map_subscribe_transient_local': map_subscribe_transient_local,
+        'odom_topic': LaunchConfiguration('odom_topic')}
 
     configured_params = RewrittenYaml(
         source_file=params_file,

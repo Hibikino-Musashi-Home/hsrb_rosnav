@@ -2,6 +2,15 @@
 Changelog for package hsrb_mapping
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.1 (2025-04-22)
+-------------------
+* Fix the issue where odometry was not being input in rosnav
+* Remove sections left as comments for future activation of unsupported features
+* Fix flake8 errors
+* revert yaml_filename comment because it is needed in ros humble
+* improve launch stability by using initial_pose parameter
+* Contributors: Keisuke Takeshita, Yosuke Matsusaka
+
 2.1.0 (2024-10-15)
 -------------------
 * Migration to ROS2 Humble
