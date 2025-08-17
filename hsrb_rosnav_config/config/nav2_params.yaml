@@ -1,5 +1,4 @@
 #maintainer: ry0hei-kobayashi
-#TODO amcl, 他はできる限り弄らずにfix
 amcl:
   ros__parameters:
     use_sim_time: True
@@ -9,43 +8,24 @@ amcl:
       y: 0.0
       z: 0.0
       yaw: 0.0
-    alpha1: 0.5
-    alpha2: 0.2
-    alpha3: 0.2
-    alpha4: 0.2
-    alpha5: 0.2
-    base_frame_id: "base_footprint"
-    beam_skip_distance: 0.5
-    beam_skip_error_threshold: 0.9
-    beam_skip_threshold: 0.3
-    do_beamskip: false
-    global_frame_id: "map"
-    lambda_short: 0.1
-    laser_likelihood_max_dist: 2.0
-    laser_max_range: -1.0
-    laser_min_range: -1.0
-    laser_model_type: "likelihood_field"
-    max_beams: 60
-    max_particles: 2000
-    min_particles: 500
-    odom_frame_id: "odom"
-    pf_err: 0.05
-    pf_z: 0.99
-    recovery_alpha_fast: 0.0
-    recovery_alpha_slow: 0.0
-    resample_interval: 1
+    alpha1: 0.07
+    alpha2: 0.07
+    alpha3: 0.01
+    alpha4: 0.01
+    alpha5: 0.01
+    laser_min_range: 0.1
     robot_model_type: "nav2_amcl::OmniMotionModel"
-    save_pose_rate: 0.5
-    sigma_hit: 0.2
-    tf_broadcast: true
-    transform_tolerance: 1.0
-    update_min_a: 0.2
-    update_min_d: 0.25
-    z_hit: 0.95
-    z_max: 0.05
-    z_rand: 0.05
-    z_short: 0.05
+    update_min_a: 0.15
+    update_min_d: 0.2
     scan_topic: scan
+    base_frame_id: base_link
+    global_frame_id: map
+    odom_frame_id: odom
+    tf_broadcast: true
+    transform_tolerance: 0.3
+    min_particles: 800
+    max_particles: 3000
+    resample_interval: 1
 
 amcl_map_client:
   ros__parameters:
@@ -110,8 +90,8 @@ controller_server:
     controller_frequency: 20.0
     controller_patience: 2.0
     min_x_velocity_threshold: 0.001
-    min_y_velocity_threshold: 0.5
-    min_theta_velocity_threshold: 0.001
+    min_y_velocity_threshold: 0.001
+    min_theta_velocity_threshold: 0.01
     failure_tolerance: 0.3
     progress_checker_plugin: "progress_checker"
     goal_checker_plugins: ["general_goal_checker"] 
@@ -129,25 +109,31 @@ controller_server:
       yaw_goal_tolerance: 0.1
 
     FollowPath:
-      plugin: "dwb_core::DWBLocalPlanner"
+      #plugin: "dwb_core::DWBLocalPlanner"
       debug_trajectory_details: True
-      min_vel_x: -0.05
-      min_vel_y: 0.0
-      max_vel_x: 0.8
-      max_vel_y: 0.0
-      max_vel_theta: 1.0
+      plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
+      use_holonomic: true
+      allow_reversing: false
+      use_rotate_to_heading: true
+      min_vel_x: -0.2
+      min_vel_y: -0.35
+      max_vel_x: 0.6
+      max_vel_y: 0.35
+      min_vel_theta: -0.3
+      max_vel_theta: 0.3
       min_speed_xy: 0.0
       max_speed_xy: 0.26
       min_speed_theta: 0.0
-      acc_lim_x: 2.5
-      acc_lim_y: 0.0
-      acc_lim_theta: 3.2
-      decel_lim_x: -2.5
-      decel_lim_y: 0.0
-      decel_lim_theta: -3.2
+      max_speed_theta: 0.10
+      acc_lim_x: 1.0
+      acc_lim_y: 0.8
+      acc_lim_theta: 1.5
+      decel_lim_x: -1.0
+      decel_lim_y: -1.0
+      decel_lim_theta: -1.5
       vx_samples: 20
-      vy_samples: 5
-      vtheta_samples: 60
+      vy_samples: 7
+      vtheta_samples: 40
       sim_time: 1.5
       linear_granularity: 0.05
       angular_granularity: 0.025
@@ -158,10 +144,10 @@ controller_server:
       stateful: True
       critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
       BaseObstacle.scale: 0.2
-      PathAlign.scale: 32.0
-      PathAlign.forward_point_distance: 0.1
-      GoalAlign.scale: 24.0
-      GoalAlign.forward_point_distance: 0.1
+      PathAlign.scale: 60.0
+      PathAlign.forward_point_distance: 0.2
+      GoalAlign.scale: 38.0
+      GoalAlign.forward_point_distance: 0.2
       PathDist.scale: 32.0
       GoalDist.scale: 24.0
       RotateToGoal.scale: 45.0
@@ -281,7 +267,7 @@ planner_server:
     planner_plugins: ["GridBased"]
     GridBased:
       plugin: "nav2_navfn_planner/NavfnPlanner"
-      tolerance: 0.5
+      tolerance: 0.3
       use_astar: false
       allow_unknown: true
 
@@ -309,7 +295,7 @@ recoveries_server:
     simulate_ahead_time: 2.0
     max_rotational_vel: 1.0
     min_rotational_vel: 0.4
-    rotational_acc_lim: 3.2
+    rotational_acc_lim: 1.0
 
 robot_state_publisher:
   ros__parameters:
